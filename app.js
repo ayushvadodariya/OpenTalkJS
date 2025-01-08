@@ -15,10 +15,16 @@ async function askToOllama(content) {
 
 async function main() {
   try {
-    const content = await fs.readFile("./questions/q1.txt");
-    const ollamaResponse = await askToOllama(content.toString());
-    await fs.writeFile("answers/a.txt", ollamaResponse.message.content);
-    console.log(`answer file created`);
+    const questionsDirPath = "./questions";
+    const answersDirPath = "./answers";
+    const questionsFileNameList = await fs.readdir(questionsDirPath);
+    questionsFileNameList.forEach(async(fileName)=>{
+      const content = await fs.readFile(`${questionsDirPath}/${fileName}`);
+      const ollamaResponse = await askToOllama(content.toString());
+      const answerFileName = `${answersDirPath}/${fileName.replace("q","a")}`;
+      await fs.writeFile(answerFileName, ollamaResponse.message.content);
+      console.log(`answer file created at ${answerFileName}`);
+    })
   } catch (error) {
     console.error("Error:", error.message);
   }
