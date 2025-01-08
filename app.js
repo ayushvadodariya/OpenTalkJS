@@ -1,39 +1,27 @@
 import ollama from "ollama";
-import fs from "fs";
+import fs from "fs/promises";
 
-function readFile(filePath){
-    return new Promise((resolve, reject)=>{
-      fs.readFile(filePath,(err,data)=>{
-        if(err) reject(err.message);
-        resolve(data.toString());
-      })
-    })
-}
-
-function createAndWriteFile(filePath, content){
-  return new Promise((resolve, reject)=>{
-    fs.writeFileSync(filePath,content,(err)=>{
-      if(err) reject(err.message);
-      resolve();
-    });
-  })
-}
-
-async function askToOllama(content){
-  try{
+async function askToOllama(content) {
+  try {
     const response = await ollama.chat({
       model: 'llama3.2',
-      messages: [{ role: 'user',content:content}],
-    })
+      messages: [{ role: 'user', content: content }],
+    });
     return response;
-  }catch(error){
-    console.error("Error occurred:", error.message);
+  } catch (error) {
+    throw new Error(`Error with Ollama: ${error.message}`);
   }
 }
 
- async function main(){
-  const content =  await readFile("./questions/q.txt");
-  const ollamaResponse = await askToOllama(content);
-  await createAndWriteFile("answers/a.txt", ollamaResponse.message.content);
+async function main() {
+  try {
+    const content = await fs.readFile("./questions/q1.txt");
+    const ollamaResponse = await askToOllama(content.toString());
+    await fs.writeFile("answers/a.txt", ollamaResponse.message.content);
+    console.log(`answer file created`);
+  } catch (error) {
+    console.error("Error:", error.message);
+  }
 }
+
 main();
