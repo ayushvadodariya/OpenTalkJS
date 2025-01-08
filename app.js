@@ -17,17 +17,18 @@ async function main() {
   try {
     const questionsDirPath = "./questions";
     const answersDirPath = "./answers";
-    const questionsFileNameList = await fs.readdir(questionsDirPath);
-    questionsFileNameList.forEach(async(fileName)=>{
-      const content = await fs.readFile(`${questionsDirPath}/${fileName}`);
-      const ollamaResponse = await askToOllama(content.toString());
-      const answerFileName = `${answersDirPath}/${fileName.replace("q","a")}`;
-      await fs.writeFile(answerFileName, ollamaResponse.message.content);
-      console.log(`answer file created at ${answerFileName}`);
-    })
+    const catagory = process.argv.slice(2)[0];
+    let randomQuestionNo  = Math.floor(Math.random() * 3) + 1;
+    console.log(catagory);
+    console.log(randomQuestionNo);
+    const readFilePath = `${questionsDirPath}/${catagory}/q${randomQuestionNo}.txt`;
+    const content = await fs.readFile(readFilePath);
+    const ollamaResponse = await askToOllama(content.toString());
+    const answerFilePath =`${answersDirPath}/${catagory}/a${randomQuestionNo}.txt`; 
+    await fs.writeFile(answerFilePath, ollamaResponse.message.content);
+    console.log(`answer file created at ${answerFilePath}`);
   } catch (error) {
     console.error("Error:", error.message);
   }
 }
-
 main();
