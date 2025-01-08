@@ -1,5 +1,5 @@
 import ollama from "ollama";
-import fs from "fs/promises";
+import fs from "fs";
 
 async function askToOllama(content) {
   try {
@@ -22,10 +22,10 @@ async function main() {
     console.log(catagory);
     console.log(randomQuestionNo);
     const readFilePath = `${questionsDirPath}/${catagory}/q${randomQuestionNo}.txt`;
-    const content = await fs.readFile(readFilePath);
+    const content = fs.readFileSync(readFilePath);
     const ollamaResponse = await askToOllama(content.toString());
     const answerFilePath =`${answersDirPath}/${catagory}/a${randomQuestionNo}.txt`; 
-    await fs.writeFile(answerFilePath, ollamaResponse.message.content);
+    fs.writeFileSync(answerFilePath, ollamaResponse.message.content);
     console.log(`answer file created at ${answerFilePath}`);
   } catch (error) {
     console.error("Error:", error.message);
